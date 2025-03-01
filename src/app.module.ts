@@ -8,11 +8,12 @@ import {ConfigModule} from '@nestjs/config';
 import {UsersModule} from './users/users.module';
 import {PrismaModule} from './core/infra/prisma/prisma.module';
 import {AuthModule} from './auth/auth.module';
-import { ReferralsModule } from './referrals/referrals.module';
-import { TapsModule } from './taps/taps.module';
-import { LevelsModule } from './levels/levels.module';
-import { TasksModule } from './tasks/tasks.module';
-import { UserTasksModule } from './user-tasks/user-tasks.module';
+import {ReferralsModule} from './referrals/referrals.module';
+import {TapsModule} from './taps/taps.module';
+import {LevelsModule} from './levels/levels.module';
+import {TasksModule} from './tasks/tasks.module';
+import {UserTasksModule} from './user-tasks/user-tasks.module';
+import { LevelConfigModule } from './level-config/level-config.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { UserTasksModule } from './user-tasks/user-tasks.module';
     LevelsModule,
     TasksModule,
     UserTasksModule,
+    LevelConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],
