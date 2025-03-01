@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Param, Query} from '@nestjs/common';
+import {Controller, Get, Post, Param, Query, ParseIntPipe} from '@nestjs/common';
 import {UserTasksService} from './user-tasks.service';
 import {
   ApiTags,
@@ -16,7 +16,7 @@ export class UserTasksController {
   @Get()
   @ApiOperation({summary: 'Получить список задач пользователя'})
   @ApiQuery({name: 'userId', type: Number, description: 'ID пользователя'})
-  async getUserTasks(@Query('userId') userId: number) {
+  async getUserTasks(@Query('userId', ParseIntPipe) userId: number) {
     return this.userTasksService.getUserTasks(userId);
   }
 
@@ -30,8 +30,8 @@ export class UserTasksController {
       'Задача автоматически завершена, награда начислена и запись создана',
   })
   async startTask(
-    @Query('userId') userId: number,
-    @Param('taskId') taskId: number
+    @Query('userId', ParseIntPipe) userId: number,
+    @Param('taskId', ParseIntPipe) taskId: number
   ) {
     return this.userTasksService.startTask(userId, taskId);
   }
