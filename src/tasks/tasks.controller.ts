@@ -6,7 +6,8 @@ import {
   Delete,
   Param,
   Body,
-  Query, ParseIntPipe,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {TasksService} from './tasks.service';
 import {CreateTaskDto} from './dto/create-task.dto';
@@ -66,7 +67,10 @@ export class TasksController {
   @ApiOperation({summary: 'Обновить задачу'})
   @ApiParam({name: 'id', type: Number, description: 'ID задачи'})
   @ApiBody({type: UpdateTaskDto})
-  async updateTask(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateTaskDto) {
+  async updateTask(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdateTaskDto
+  ) {
     return this.tasksService.updateTask(id, data);
   }
 

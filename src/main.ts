@@ -17,7 +17,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const httpAdapter = app.get(HttpAdapterHost);
 
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.urlencoded({extended: true}));
   app.enableCors();
   app.useLogger(systemLogger);
   // app.useGlobalFilters(new AllExceptionsFilter(httpAdapter, cls, systemLogger));

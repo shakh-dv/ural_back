@@ -1,6 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UserTasksController } from './user-tasks.controller';
-import { UserTasksService } from './user-tasks.service';
+import {Test, TestingModule} from '@nestjs/testing';
+import {UserTasksController} from './user-tasks.controller';
+import {UserTasksService} from './user-tasks.service';
 
 describe('UserTasksController', () => {
   let controller: UserTasksController;

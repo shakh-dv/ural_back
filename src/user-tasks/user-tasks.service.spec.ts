@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UserTasksService } from './user-tasks.service';
+import {Test, TestingModule} from '@nestjs/testing';
+import {UserTasksService} from './user-tasks.service';
 
 describe('UserTasksService', () => {
   let service: UserTasksService;

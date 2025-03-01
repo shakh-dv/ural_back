@@ -48,34 +48,35 @@ export class TapsController {
     return this.tapsService.useTaps(userId, data.amount);
   }
 
-  @Post('boost')
-  @ApiOperation({
-    summary: 'Активировать буст для ускорения восстановления тапов',
-  })
-  @ApiQuery({name: 'userId', type: Number, description: 'ID пользователя'})
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        speedUp: {type: 'number', description: 'Скорость ускорения в минутах'},
-        duration: {type: 'number', description: 'Длительность буста в минутах'},
-      },
-      required: ['speedUp', 'duration'],
-    },
-  })
-  @ApiResponse({status: 200, description: 'Буст активирован'})
-  async boostTaps(
-    @Query('userId', ParseIntPipe) userId: number,
-    @Body() boostData: {speedUp: number; duration: number}
-  ) {
-    return this.tapsService.boostTaps(userId, boostData);
-  }
-
-  @Post('bonus')
-  @ApiOperation({summary: 'Активировать ежедневный бонус (3 раза в день)'})
-  @ApiQuery({name: 'userId', type: Number, description: 'ID пользователя'})
-  @ApiResponse({status: 200, description: 'Бонус применён'})
-  async claimBonus(@Query('userId', ParseIntPipe) userId: number) {
-    return this.tapsService.claimTapBonus(userId);
-  }
+  // @Post('boost')
+  // @ApiOperation({
+  //   summary: 'Активировать буст для ускорения восстановления тапов',
+  // })
+  // @ApiQuery({name: 'userId', type: Number, description: 'ID пользователя'})
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       speedUp: {type: 'number', description: 'Скорость ускорения в минутах'},
+  //       duration: {type: 'number', description: 'Длительность буста в минутах'},
+  //     },
+  //     required: ['speedUp', 'duration'],
+  //   },
+  // })
+  //
+  // @ApiResponse({status: 200, description: 'Буст активирован'})
+  // async boostTaps(
+  //   @Query('userId', ParseIntPipe) userId: number,
+  //   @Body() boostData: {speedUp: number; duration: number}
+  // ) {
+  //   return this.tapsService.boostTaps(userId, boostData);
+  // }
+  //
+  // @Post('bonus')
+  // @ApiOperation({summary: 'Активировать ежедневный бонус (3 раза в день)'})
+  // @ApiQuery({name: 'userId', type: Number, description: 'ID пользователя'})
+  // @ApiResponse({status: 200, description: 'Бонус применён'})
+  // async claimBonus(@Query('userId', ParseIntPipe) userId: number) {
+  //   return this.tapsService.claimTapBonus(userId);
+  // }
 }

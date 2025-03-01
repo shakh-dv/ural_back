@@ -15,7 +15,7 @@ async function main() {
 }
 main()
   .then(async () => {
-    console.log('Seeds loaded successfully!')
+    console.log('Seeds loaded successfully!');
     await prisma.$disconnect();
   })
   .catch(async e => {

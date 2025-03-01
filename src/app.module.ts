@@ -13,7 +13,9 @@ import {TapsModule} from './taps/taps.module';
 import {LevelsModule} from './levels/levels.module';
 import {TasksModule} from './tasks/tasks.module';
 import {UserTasksModule} from './user-tasks/user-tasks.module';
-import { LevelConfigModule } from './level-config/level-config.module';
+import {LevelConfigModule} from './level-config/level-config.module';
+import {BoostItemsModule} from './boost-items/boost-items.module';
+import {BoostEffectsModule} from './boost-effects/boost-effects.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { LevelConfigModule } from './level-config/level-config.module';
     TasksModule,
     UserTasksModule,
     LevelConfigModule,
+    BoostItemsModule,
+    BoostEffectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

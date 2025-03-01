@@ -1,4 +1,11 @@
-import {Controller, Get, Post, Param, Query, ParseIntPipe} from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
 import {UserTasksService} from './user-tasks.service';
 import {
   ApiTags,
