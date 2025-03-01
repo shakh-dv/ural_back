@@ -46,7 +46,12 @@ export class LevelsService {
   async getMaxEnergy(level: number): Promise<number> {
     // Если в таблице LevelConfig есть конкретное значение, возвращаем его, иначе используем формулу
     const config = await this.prisma.levelConfig.findUnique({where: {level}});
-    return config ? config.maxEnergy : 100 + 10 * Math.floor(level / 5);
+    // return config ? config.maxEnergy : 100 + 10 * Math.floor(level / 5);
+    if (config) return config.maxEnergy;
+    // Для уровня 1 по умолчанию возвращаем 500,
+    // а для остальных уровней возвращаем 500 + (level - 1) * 10
+    if (level === 1) return 500;
+    return 500 + (level - 1) * 10;
   }
 
   async resetXP(userId: number) {
