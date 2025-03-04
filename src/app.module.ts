@@ -16,6 +16,9 @@ import {UserTasksModule} from './user-tasks/user-tasks.module';
 import {LevelConfigModule} from './level-config/level-config.module';
 import {BoostItemsModule} from './boost-items/boost-items.module';
 import {BoostEffectsModule} from './boost-effects/boost-effects.module';
+import {UploadsModule} from './uploads/uploads.module';
+import {SERVER_STATIC} from './shared/constants/constants';
+import {ServeStaticModule} from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -30,6 +33,10 @@ import {BoostEffectsModule} from './boost-effects/boost-effects.module';
       },
       global: true,
     }),
+    ServeStaticModule.forRoot({
+      rootPath: SERVER_STATIC.PATH,
+      serveRoot: `/${SERVER_STATIC.NAME}`,
+    }),
     LoggerModule,
     PrismaModule,
     AuthModule,
@@ -42,6 +49,7 @@ import {BoostEffectsModule} from './boost-effects/boost-effects.module';
     LevelConfigModule,
     BoostItemsModule,
     BoostEffectsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -141,3 +141,18 @@ model UserBonus {
 
   @@map("user_bonus")
 }
+
+model Uploads {
+  id         Int      @id @default(autoincrement())
+  filename   String
+  size       Int
+  mimetype   String
+  xsFilename String?
+  xsSize     Int?
+  mdFilename String?
+  mdSize     Int?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("uploads")
+}
