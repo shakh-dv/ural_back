@@ -60,6 +60,8 @@ model Task {
   link        String?
   taskType    TaskType   @default(click)
   status      TaskStatus @default(pending)
+  imageId     Int?
+  image       Uploads?   @relation(fields: [imageId], references: [id], onDelete: SetNull)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   UserTask    UserTask[]
@@ -153,6 +155,7 @@ model Uploads {
   mdSize     Int?
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
+  Task       Task[]
 
   @@map("uploads")
 }

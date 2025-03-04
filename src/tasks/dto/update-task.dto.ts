@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsString, IsOptional, IsInt, IsEnum} from 'class-validator';
+import {IsString, IsOptional, IsInt, IsEnum, IsNumber} from 'class-validator';
 import {TaskType} from './create-task.dto';
 
 export class UpdateTaskDto {
@@ -22,6 +22,11 @@ export class UpdateTaskDto {
   @IsOptional()
   @IsString()
   link?: string;
+
+  @ApiProperty({example: 1, required: false})
+  @IsOptional()
+  @IsNumber()
+  imageId?: number;
 
   @ApiProperty({enum: TaskType, example: TaskType.SUBSCRIBE, required: false})
   @IsOptional()

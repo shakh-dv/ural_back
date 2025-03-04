@@ -1,4 +1,11 @@
-import {IsString, IsNotEmpty, IsInt, IsOptional, IsEnum} from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  IsOptional,
+  IsEnum,
+  IsNumber,
+} from 'class-validator';
 import {ApiProperty} from '@nestjs/swagger';
 
 export enum TaskType {
@@ -26,6 +33,11 @@ export class CreateTaskDto {
   @IsOptional()
   @IsString()
   link?: string;
+
+  @ApiProperty({example: 1, required: false})
+  @IsOptional()
+  @IsNumber()
+  imageId?: number;
 
   @ApiProperty({enum: TaskType, example: TaskType.CLICK, required: false})
   @IsOptional()
