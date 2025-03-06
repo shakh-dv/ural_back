@@ -9,7 +9,7 @@
     "node": ">18.0.0"
   },
   "scripts": {
-    "build": "nest build",
+    "build": "prisma generate && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "NODE_ENV=production nest start",
     "start:dev": "prisma generate && prisma db push && nest start --watch",
