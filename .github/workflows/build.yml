@@ -1,0 +1,28 @@
+name: Build and deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: [ self-hosted, production ]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Build for production
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          NOTICE_PORT: ${{ secrets.NOTICE_PORT }}
+          NOTICE_DOMAIN: ${{ secrets.NOTICE_DOMAIN }}
+          NOTICE_PASSWORD: ${{ secrets.NOTICE_PASSWORD }}
+        run: docker compose up -d --build
+
+      - name: Cleanup
+        run: docker system prune -f
