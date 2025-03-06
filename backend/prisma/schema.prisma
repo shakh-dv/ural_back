@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReferralStatus {
+  pending
+  approved
+  rejected
+}
+
+enum TaskType {
+  click
+  subscribe
+  external
+}
+
+enum TaskStatus {
+  pending
+  inProgress
+  completed
+  failed
+}
+
+model User {
+  id               Int           @id @default(autoincrement())
+  telegramId       Int           @unique @map("telegram_id")
+  firstName        String        @map("first_name")
+  balance          Int           @default(0)
+  xp               Int           @default(0)
+  level            Int           @default(1)
+  maxTaps          Int           @default(500)
+  taps             Int           @default(500)
+  lastTapRegen     DateTime      @default(now())
+  referralCode     String        @unique @default(uuid())
+  referrals        Referral[]    @relation(name: "InviterRelation")
+  inviteeReferrals Referral[]    @relation(name: "InviteeRelation")
+  username         String?       @db.VarChar(255)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  UserTask         UserTask[]
+  UserBonus        UserBonus[]
+  ActiveBoost      ActiveBoost[]
+
+  @@map("users")
+}
+
+model Task {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String
+  reward      Int
+  link        String?
+  taskType    TaskType   @default(click)
+  status      TaskStatus @default(pending)
+  imageId     Int?
+  image       Uploads?   @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  UserTask    UserTask[]
+
+  @@map("tasks")
+}
+
+model UserTask {
+  id          Int        @id @default(autoincrement())
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId      Int
+  task        Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  status      TaskStatus @default(pending)
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([userId, taskId])
+  @@map("user_tasks")
+}
+
+model Referral {
+  id           Int            @id @default(autoincrement())
+  inviterId    Int
+  inviter      User           @relation(name: "InviterRelation", fields: [inviterId], references: [id], onDelete: Cascade)
+  inviteeId    Int?
+  invitee      User?          @relation(name: "InviteeRelation", fields: [inviteeId], references: [id], onDelete: Cascade)
+  rewardEarned Int            @default(0)
+  status       ReferralStatus @default(pending)
+  completedAt  DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([inviterId])
+  @@index([inviteeId])
+  @@map("referrals")
+}
+
+model LevelConfig {
+  level     Int @id
+  maxEnergy Int
+
+  @@map("level_config")
+}
+
+model BoostItem {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  cost        Int
+  active      Boolean  @default(true)
+  effectType  String // Например, 'resetTaps', 'doubleTapPoints', 'increaseRegen'
+  effectValue Int? // Параметр эффекта (например, длительность в минутах или величина корректировки)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("boost_items")
+}
+
+model ActiveBoost {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  effectType String // Например, 'doubleTapPoints'
+  expiresAt  DateTime // Время окончания действия эффекта
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("active_boosts")
+}
+
+model UserBonus {
+  id     Int    @id @default(autoincrement())
+  userId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date   String
+
+  @@map("user_bonus")
+}
+
+model Uploads {
+  id         Int      @id @default(autoincrement())
+  filename   String
+  size       Int
+  mimetype   String
+  xsFilename String?
+  xsSize     Int?
+  mdFilename String?
+  mdSize     Int?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  Task       Task[]
+
+  @@map("uploads")
+}
