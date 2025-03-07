@@ -33,6 +33,7 @@ services:
       - JWT_EXPIRES_IN=30d
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/ural?schema=public
       - CDN_EDGE_PREFIX=https://api.ural.ru/uploads/dispatch/
+      - REACT_APP_URL'https://ural-tap.vercel.app/
     build:
       context: ./backend
       target: prod
