@@ -16,7 +16,7 @@ export class TasksService {
   async getAllTasks(filterDto?: GetTasksFilterDto) {
     const filters: Prisma.TaskWhereInput = {};
     if (filterDto?.taskType) filters.taskType = filterDto.taskType;
-    if (filterDto?.status) filters.status = filterDto.status;
+    // if (filterDto?.status) filters.status = filterDto.status;
 
     const page = filterDto?.page && filterDto.page > 0 ? filterDto.page : 1;
     const limit =
