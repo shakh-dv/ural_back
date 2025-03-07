@@ -1,13 +1,12 @@
 # Stage 1: Build the application
-FROM node:20-alpine as build-stage
+FROM node:20-alpine3.20 as build-stage
 
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml .npmrc ./
 
-# Установите OpenSSL и libssl1.1
+# Установите OpenSSL
 RUN apk add --no-cache openssl
-RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main libssl1.1
 
 # Установите pnpm и зависимости
 RUN npm install -g pnpm@8.15.2 && pnpm install --frozen-lockfile
@@ -20,9 +19,8 @@ FROM node:20-alpine as prod
 
 WORKDIR /app
 
-# Установите OpenSSL и libssl1.1
+# Установите OpenSSL
 RUN apk add --no-cache openssl
-RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main libssl1.1
 
 # Установите pnpm
 RUN npm install -g pnpm@8.15.2
