@@ -27,7 +27,7 @@ export class TasksService {
       where: filters,
       skip,
       take: limit,
-      include: {image: true}, // Загружаем изображение
+      include: {image: true},
     });
     const total = await this.prismaService.task.count({where: filters});
 
