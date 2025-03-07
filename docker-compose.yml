@@ -31,6 +31,7 @@ services:
       - POSTGRES_PORT=5432
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=30d
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/ural?schema=public
       - CDN_EDGE_PREFIX=https://api.ural.ru/uploads/dispatch/
     build:
       context: ./backend
