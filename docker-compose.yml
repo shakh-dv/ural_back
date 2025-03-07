@@ -14,7 +14,7 @@ services:
       - app
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/traefik/acme/acme.json:/etc/traefik/acme/acme.json
+      - /etc/traefik/acme/acme.json:/acme.json
       - ./configuration/traefik.yml:/traefik.yml:ro
       - ./configuration/config.yml:/config.yml
 
