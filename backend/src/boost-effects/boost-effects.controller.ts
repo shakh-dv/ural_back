@@ -20,7 +20,7 @@ export class BoostEffectsController {
   @ApiResponse({status: 200, description: 'Буст успешно применён'})
   async purchaseBoost(
     @Param('id', ParseIntPipe) id: number,
-    @Query('userId') userId: number
+    @Query('userId', ParseIntPipe) userId: number
   ) {
     return this.boostEffectsService.applyBoostEffect(userId, id);
   }
