@@ -38,10 +38,10 @@ services:
       target: prod
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ural-backend.rule=Host(`api.ural.ru`)"
+      - "traefik.http.routers.ural-backend.rule=Host(`api.uraltap.ru`)"
       - "traefik.http.routers.ural-backend.tls=true"
       - "traefik.http.routers.ural-backend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.ural-backend.loadbalancer.server.port=4200"
+      - "traefik.http.services.ural-backend.loadbalancer.server.port=4000"
       - "traefik.docker.network=app"
     volumes:
       - ~/volumes/ural/uploads:/app/uploads
