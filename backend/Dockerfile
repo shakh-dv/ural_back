@@ -9,7 +9,6 @@ RUN apk add --no-cache openssl
 RUN npm install -g pnpm@8.15.2 && pnpm install --frozen-lockfile
 
 COPY . .
-
 RUN pnpm build
 
 # Stage 2: Production-ready image
@@ -19,10 +18,7 @@ WORKDIR /app
 
 RUN npm install -g pnpm@8.15.2
 
-COPY --from=build-stage /app/package.json /app/pnpm-lock.yaml /app/.npmrc ./
-COPY --from=build-stage /app/dist /app/dist
-
-RUN pnpm install --prod --frozen-lockfile
+COPY --from=build-stage /app /app
 
 ENV NODE_ENV=production
 
