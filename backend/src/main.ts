@@ -1,10 +1,10 @@
-import {HttpAdapterHost, NestFactory} from '@nestjs/core';
-import {AppModule} from './app.module';
-import {SystemLogger} from './core/infra/logger/logger';
-import {ConfigService} from '@nestjs/config';
-import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
-import {AllExceptionsFilter} from './core/infra/exception-filters/all-exceptions.filter';
-import {ClsService} from 'nestjs-cls';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { SystemLogger } from './core/infra/logger/logger';
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AllExceptionsFilter } from './core/infra/exception-filters/all-exceptions.filter';
+import { ClsService } from 'nestjs-cls';
 import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
@@ -17,14 +17,15 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const httpAdapter = app.get(HttpAdapterHost);
 
-  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(bodyParser.urlencoded({ extended: true }));
   app.useLogger(systemLogger);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter, cls, systemLogger));
-  app.enableCors({
-    origin: configService.getOrThrow<string>('REACT_APP_URL'),
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+  app.enableCors();
+  // {
+  //   origin: configService.getOrThrow<string>('REACT_APP_URL'),
+  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  //   credentials: true,
+  // }
 
   if (
     ['development', 'staging'].includes(
