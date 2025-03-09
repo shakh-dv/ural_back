@@ -18,7 +18,7 @@ export class TapsService {
 
     const now = new Date();
 
-    // восстанавливаем тапы каждые час.
+    // восстанавливаем тапы каждые 20 минут.
     const interval = regenInterval;
 
     const elapsedTime = Math.floor(
