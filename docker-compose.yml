@@ -22,6 +22,7 @@ services:
     restart: always
     environment:
       - BASE_URL=https://api.ural.ru
+      - NODE_ENV=production
       - APP_NAME=ural
       - SERVER_PORT=4000
       - POSTGRES_DATABASE=ural
