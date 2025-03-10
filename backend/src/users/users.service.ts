@@ -64,6 +64,7 @@ export class UsersService {
         lastTapRegen: true,
         balance: true,
         referralCode: true,
+        ActiveBoost: true,
         createdAt: true,
         updatedAt: true,
       },
