@@ -40,6 +40,7 @@ export class UsersService {
         taps: true,
         balance: true,
         lastTapRegen: true,
+        ActiveBoost: true,
         referralCode: true,
         createdAt: true,
         updatedAt: true,
