@@ -79,7 +79,7 @@ export class ReferralsService {
   async generateReferralLink(id: number) {
     const user = await this.userService.getById(id);
     return {
-      link: `https://t.me/uraltap_bot?startapp=${user.referralCode}`,
+      link: `https://t.me/uraltap_bot?start=${user.referralCode}`,
     };
   }
 
