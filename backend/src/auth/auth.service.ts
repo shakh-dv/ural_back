@@ -21,7 +21,7 @@ export class AuthService {
     try {
       validate(data, botToken);
     } catch (e) {
-      throw new UnauthorizedException('Invalid Telegram authentication');
+      throw new UnauthorizedException(e);
     }
   }
 

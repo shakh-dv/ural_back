@@ -17,7 +17,6 @@ export class ReferralsService {
     const inviter = await this.prismaService.user.findUnique({
       where: {referralCode},
     });
-    console.log(inviter);
 
     if (!inviter) {
       throw new BadRequestException('Invalid referral code');
@@ -26,8 +25,6 @@ export class ReferralsService {
     const invitee = await this.prismaService.user.findUnique({
       where: {telegramId: BigInt(inviteeTelegramId)},
     });
-
-    console.log(invitee);
 
     if (!invitee) {
       throw new NotFoundException('Invitee not found');
@@ -43,8 +40,6 @@ export class ReferralsService {
         inviteeId: invitee.id,
       },
     });
-
-    console.log(existingReferral);
 
     if (existingReferral) {
       throw new BadRequestException('Referral already exists');

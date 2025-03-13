@@ -6,7 +6,7 @@ const data = sign(
       added_to_attachment_menu: false,
       allows_write_to_pm: false,
       first_name: 'user-first-name',
-      id: 422,
+      id: 8489985,
       is_bot: true,
       is_premium: false,
       language_code: 'en',

@@ -2,7 +2,7 @@ import {Body, Controller, Post, Query} from '@nestjs/common';
 import {AuthService} from './auth.service';
 import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
 import {ReferralsService} from '../referrals/referrals.service';
-import * as console from "console";
+import * as console from 'console';
 
 @ApiBearerAuth()
 @ApiTags('Auth')
@@ -16,14 +16,12 @@ export class AuthController {
   @Post('login')
   async login(
     @Body('data') initData: string,
-    @Query('startapp') referralCode?: string
+    @Query('start') referralCode?: string
   ) {
     await this.authService.verifyTelegramAuth(initData);
-    console.log(referralCode);
     const user = await this.authService.validateUser(initData);
 
     if (referralCode) {
-      console.log(referralCode);
       await this.referralsService.handleReferral(referralCode, user.telegramId);
     }
 
