@@ -15,7 +15,7 @@ export class AuthController {
   @Post('login')
   async login(
     @Body('data') initData: string,
-    @Query('start') referralCode?: string
+    @Query('startapp') referralCode?: string
   ) {
     await this.authService.verifyTelegramAuth(initData);
 
