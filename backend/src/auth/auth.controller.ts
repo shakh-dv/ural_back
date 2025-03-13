@@ -22,6 +22,7 @@ export class AuthController {
     const user = await this.authService.validateUser(initData);
 
     if (referralCode) {
+      console.log(referralCode);
       await this.referralsService.handleReferral(referralCode, user.telegramId);
     }
 
