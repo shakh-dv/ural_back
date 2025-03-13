@@ -1,10 +1,14 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { SystemLogger } from './core/infra/logger/logger';
-import { ConfigService } from '@nestjs/config';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AllExceptionsFilter } from './core/infra/exception-filters/all-exceptions.filter';
-import { ClsService } from 'nestjs-cls';
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
+import {HttpAdapterHost, NestFactory} from '@nestjs/core';
+import {AppModule} from './app.module';
+import {SystemLogger} from './core/infra/logger/logger';
+import {ConfigService} from '@nestjs/config';
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
+import {AllExceptionsFilter} from './core/infra/exception-filters/all-exceptions.filter';
+import {ClsService} from 'nestjs-cls';
 import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
@@ -17,7 +21,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const httpAdapter = app.get(HttpAdapterHost);
 
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.urlencoded({extended: true}));
   app.useLogger(systemLogger);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter, cls, systemLogger));
   app.enableCors();
@@ -48,7 +52,6 @@ async function bootstrap() {
     `Server is running on port: ${configService.getOrThrow<number>('SERVER_PORT')}`,
     bootstrap.name
   );
-
 }
 
 bootstrap();
