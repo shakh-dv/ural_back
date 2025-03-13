@@ -11,13 +11,13 @@ export class UsersService {
   async findOrCreate(data: any) {
     const {id, username, first_name} = data;
     let user = await this.prismaService.user.findUnique({
-      where: {telegramId: id},
+      where: {telegramId: BigInt(id)},
     });
 
     if (!user) {
       user = await this.prismaService.user.create({
         data: {
-          telegramId: id,
+          telegramId: BigInt(id),
           username: username || '',
           firstName: first_name,
         },

@@ -13,7 +13,7 @@ export class ReferralsService {
     private readonly userService: UsersService
   ) {}
 
-  async handleReferral(referralCode: string, inviteeTelegramId: number) {
+  async handleReferral(referralCode: string, inviteeTelegramId: bigint) {
     const inviter = await this.prismaService.user.findUnique({
       where: {referralCode},
     });
@@ -23,7 +23,7 @@ export class ReferralsService {
     }
 
     const invitee = await this.prismaService.user.findUnique({
-      where: {telegramId: inviteeTelegramId},
+      where: {telegramId: BigInt(inviteeTelegramId)},
     });
 
     if (!invitee) {

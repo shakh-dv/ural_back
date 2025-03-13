@@ -32,7 +32,7 @@ enum TaskStatus {
 
 model User {
   id               Int           @id @default(autoincrement())
-  telegramId       Int           @unique @map("telegram_id")
+  telegramId       BigInt        @unique @map("telegram_id")
   firstName        String        @map("first_name")
   balance          Int           @default(0)
   xp               Int           @default(0)
