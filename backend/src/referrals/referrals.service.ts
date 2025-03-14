@@ -83,7 +83,6 @@ export class ReferralsService {
     };
   }
 
-  //TODO: добавить условие для получения бонуса
   async rewardInviter(referralId: number) {
     const referral = await this.prismaService.referral.findUnique({
       where: {id: referralId},
