@@ -18,7 +18,7 @@ export class ReferralsController {
   }
 
   @Get('referral-link')
-  async getReferralLink(@Query('userId') userId: number) {
+  async getReferralLink(@Query('userId', ParseIntPipe) userId: number) {
     return this.referralsService.generateReferralLink(userId);
   }
 
