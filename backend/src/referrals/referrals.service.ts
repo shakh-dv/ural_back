@@ -66,6 +66,7 @@ export class ReferralsService {
           select: {
             id: true,
             firstName: true,
+            avatar: true,
           },
         },
         rewardEarned: true,
