@@ -29,10 +29,9 @@ export class BoostEffectsService {
       data: {balance: {decrement: boost.cost}},
     });
 
-    // Применяем эффект буста
     switch (boost.effectType) {
       case 'resetTaps':
-        // Эффект: мгновенно устанавливаем энергию равной maxTaps и сбрасываем таймер восстановления
+        // Мгновенно восстанавливаем энергию и сбрасываем таймер
         await this.prismaService.user.update({
           where: {id: userId},
           data: {
@@ -43,9 +42,21 @@ export class BoostEffectsService {
         break;
 
       case 'doubleTapPoints':
-        // Эффект: активируем удвоение очков за тап.
-        // Создаем запись в таблице ActiveBoost с длительностью, указанной в effectValue (по умолчанию 5 минут)
-        const durationMinutes = boost.effectValue ?? 5;
+        // Проверяем, есть ли уже активный boost
+        const existingBoost = await this.prismaService.activeBoost.findFirst({
+          where: {
+            userId,
+            effectType: 'doubleTapPoints',
+            expiresAt: {gt: new Date()}, // Буст ещё не истёк
+          },
+        });
+
+        if (existingBoost) {
+          throw new BadRequestException('Boost is already active'); // Ошибка для фронта
+        }
+
+        // Если буста нет — создаем новый
+        const durationMinutes = boost.effectValue ?? 4;
         await this.prismaService.activeBoost.create({
           data: {
             userId,
@@ -56,12 +67,28 @@ export class BoostEffectsService {
         break;
 
       case 'increaseRegen':
-        // Эффект: ускоряем восстановление, отматывая время lastTapRegen назад на effectValue минут (по умолчанию 30)
-        const adjustment = (boost.effectValue ?? 30) * 60 * 1000;
-        const newRegen = new Date(user.lastTapRegen.getTime() - adjustment);
-        await this.prismaService.user.update({
-          where: {id: userId},
-          data: {lastTapRegen: newRegen},
+        // Ускоряем восстановление, если буст ещё не активен
+        const activeRegenBoost = await this.prismaService.activeBoost.findFirst(
+          {
+            where: {
+              userId,
+              effectType: 'increaseRegen',
+              expiresAt: {gt: new Date()},
+            },
+          }
+        );
+
+        if (activeRegenBoost) {
+          throw new BadRequestException('Regeneration boost is already active');
+        }
+
+        const regenDuration = boost.effectValue ?? 10; // минут
+        await this.prismaService.activeBoost.create({
+          data: {
+            userId,
+            effectType: 'increaseRegen',
+            expiresAt: new Date(Date.now() + regenDuration * 60 * 1000),
+          },
         });
         break;
 

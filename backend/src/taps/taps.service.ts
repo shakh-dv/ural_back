@@ -4,11 +4,15 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import {PrismaService} from '../core/infra/prisma/prisma.service';
-import {regenInterval} from '../shared/constants/constants';
+import {BASE_REGEN_INTERVAL} from '../shared/constants/constants';
+import {LevelsService} from '../levels/levels.service';
 
 @Injectable()
 export class TapsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly levelsService: LevelsService
+  ) {}
 
   async getTaps(userId: number) {
     const user = await this.prismaService.user.findUnique({
@@ -18,28 +22,50 @@ export class TapsService {
 
     const now = new Date();
 
-    // восстанавливаем тапы каждые 20 минут.
-    const interval = regenInterval;
+    // Получаем maxTaps через LevelsService
+    const maxTaps = await this.levelsService.getMaxEnergy(user.level);
 
+    // Определяем базовый интервал восстановления (например, 20 минут = 1200 сек)
+    let regenInterval = BASE_REGEN_INTERVAL;
+
+    // Проверяем активный буст increaseRegen (если есть, уменьшаем интервал)
+    const activeBoost = await this.prismaService.activeBoost.findFirst({
+      where: {
+        userId,
+        effectType: 'increaseRegen',
+        expiresAt: {gt: now},
+      },
+    });
+
+    if (activeBoost) {
+      regenInterval /= 2; // ускоряем в 2 раза
+    }
+
+    // Считаем время с последнего восстановления
     const elapsedTime = Math.floor(
       (now.getTime() - user.lastTapRegen.getTime()) / 1000
     );
-    const tapsToRegen = Math.floor(elapsedTime / interval) * 500;
 
+    // Рассчитываем количество тапов, которые можно восстановить
+    const tapsToRegen = Math.floor(elapsedTime / regenInterval) * maxTaps;
+
+    // Новое количество тапов
     let newTaps = user.taps + tapsToRegen;
-    if (newTaps > user.maxTaps) newTaps = user.maxTaps;
+    if (newTaps > maxTaps) newTaps = maxTaps;
 
-    // Обновляем данные пользователя
-    await this.prismaService.user.update({
-      where: {id: userId},
-      data: {taps: newTaps, lastTapRegen: now},
-    });
+    // Если количество тапов изменилось, обновляем БД
+    if (newTaps !== user.taps) {
+      await this.prismaService.user.update({
+        where: {id: userId},
+        data: {taps: newTaps, lastTapRegen: now},
+      });
+    }
 
     return {
       taps: newTaps,
-      maxTaps: user.maxTaps,
+      maxTaps,
       nextRegen: regenInterval - (elapsedTime % regenInterval),
-      energyIncrement: 500,
+      regenSpeed: activeBoost ? 'FAST' : 'NORMAL',
     };
   }
 

@@ -1,4 +1,4 @@
-export const regenInterval = 1200; // in seconds
+export const BASE_REGEN_INTERVAL = 1200; // in seconds
 
 import * as path from 'path';
 
