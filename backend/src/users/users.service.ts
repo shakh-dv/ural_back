@@ -9,7 +9,7 @@ export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findOrCreate(data: any) {
-    const {id, username, first_name} = data;
+    const {id, username, first_name, photo_url} = data;
     let user = await this.prismaService.user.findUnique({
       where: {telegramId: BigInt(id)},
     });
@@ -20,6 +20,7 @@ export class UsersService {
           telegramId: BigInt(id),
           username: username || '',
           firstName: first_name,
+          avatar: photo_url || '',
         },
       });
     }
@@ -32,6 +33,7 @@ export class UsersService {
       select: {
         id: true,
         username: true,
+        avatar: true,
         firstName: true,
         telegramId: true,
         xp: true,
@@ -56,6 +58,7 @@ export class UsersService {
         username: true,
         firstName: true,
         telegramId: true,
+        avatar: true,
         xp: true,
         level: true,
         maxTaps: true,
@@ -97,6 +100,7 @@ export class UsersService {
         id: true,
         username: true,
         firstName: true,
+        avatar: true,
         referralCode: true,
         telegramId: true,
         xp: true,

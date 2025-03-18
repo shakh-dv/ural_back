@@ -46,19 +46,61 @@ export class TapsService {
   async useTaps(userId: number, amount: number = 1) {
     const user = await this.prismaService.user.findUnique({
       where: {id: userId},
+      include: {ActiveBoost: true}, // Загружаем активные бусты
     });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     if (user.taps < amount) {
       throw new BadRequestException('Not enough taps available');
     }
-    const newTaps = user.taps - amount;
-    await this.prismaService.user.update({
-      where: {id: userId},
-      data: {taps: newTaps},
+
+    // Получаем tapCount для текущего уровня
+    const levelConfig = await this.prismaService.levelConfig.findUnique({
+      where: {level: user.level},
     });
-    return {taps: newTaps, message: `${amount} tap(s) used`};
+
+    // Если нет данных для текущего уровня, ищем ближайший предыдущий
+    const tapCount =
+      levelConfig?.tapCount ??
+      (
+        await this.prismaService.levelConfig.findFirst({
+          where: {level: {lte: user.level}},
+          orderBy: {level: 'desc'},
+        })
+      )?.tapCount ??
+      1; // Если вообще нет данных в LevelConfig, берём 1 по умолчанию
+
+    // Проверяем, есть ли активный буст на удвоение очков
+    const hasDoublePointsBoost = user.ActiveBoost.some(
+      boost =>
+        boost.effectType === 'doubleTapPoints' && boost.expiresAt > new Date()
+    );
+
+    // Вычисляем заработанные монеты
+    let coinsEarned = amount * tapCount;
+    if (hasDoublePointsBoost) {
+      coinsEarned *= 2; // Удваиваем, если есть буст
+    }
+
+    // Обновляем пользователя: уменьшаем тапы, добавляем монеты
+    const updatedUser = await this.prismaService.user.update({
+      where: {id: userId},
+      data: {
+        taps: {decrement: amount},
+        balance: {increment: coinsEarned},
+      },
+      select: {taps: true, balance: true},
+    });
+
+    return {
+      taps: updatedUser.taps,
+      balance: updatedUser.balance,
+      coinsEarned: coinsEarned,
+      message: `${amount} tap(s) used`,
+    };
   }
 
   // async boostTaps(

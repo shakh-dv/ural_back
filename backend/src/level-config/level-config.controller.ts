@@ -44,11 +44,14 @@ export class LevelConfigController {
       properties: {
         level: {type: 'number', example: 5},
         maxEnergy: {type: 'number', example: 110},
+        tapCount: {type: 'number', example: 4},
       },
       required: ['level', 'maxEnergy'],
     },
   })
-  async create(@Body() data: {level: number; maxEnergy: number}) {
+  async create(
+    @Body() data: {level: number; maxEnergy: number; tapCount: number}
+  ) {
     return this.levelConfigService.create(data);
   }
 
@@ -60,13 +63,14 @@ export class LevelConfigController {
       type: 'object',
       properties: {
         maxEnergy: {type: 'number', example: 120},
+        tapCount: {type: 'number', example: 4},
       },
       required: ['maxEnergy'],
     },
   })
   async update(
     @Param('level', ParseIntPipe) level: number,
-    @Body() data: {maxEnergy: number}
+    @Body() data: {maxEnergy: number; tapCount: number}
   ) {
     return this.levelConfigService.update(Number(level), data);
   }

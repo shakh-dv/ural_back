@@ -34,6 +34,7 @@ model User {
   id               Int           @id @default(autoincrement())
   telegramId       BigInt        @unique @map("telegram_id")
   firstName        String        @map("first_name")
+  avatar           String?
   balance          Int           @default(0)
   xp               Int           @default(0)
   level            Int           @default(1)
@@ -105,6 +106,7 @@ model Referral {
 model LevelConfig {
   level     Int @id
   maxEnergy Int
+  tapCount  Int @default(1)
 
   @@map("level_config")
 }

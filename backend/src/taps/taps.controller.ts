@@ -40,7 +40,23 @@ export class TapsController {
       required: ['amount'],
     },
   })
-  @ApiResponse({status: 200, description: 'Тапы успешно потрачены'})
+  @ApiResponse({
+    status: 200,
+    description: 'Тапы успешно потрачены',
+    schema: {
+      type: 'object',
+      properties: {
+        taps: {type: 'number', description: 'Оставшееся количество тапов'},
+        coinsEarned: {type: 'number', description: 'Сколько монет заработано'},
+        balance: {type: 'number', description: 'Обновленный баланс'},
+        activeBoosts: {
+          type: 'array',
+          items: {type: 'string'},
+          description: 'Активные бусты пользователя',
+        },
+      },
+    },
+  })
   async useTaps(
     @Query('userId', ParseIntPipe) userId: number,
     @Body() data: {amount: number}
