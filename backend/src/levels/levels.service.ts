@@ -65,12 +65,21 @@ export class LevelsService {
   async getUserLevel(userId: number) {
     const user = await this.prisma.user.findUnique({where: {id: userId}});
     if (!user) throw new NotFoundException('User not found');
+
     const requiredXP = this.calculateRequiredXP(user.level);
+
+    // Ищем запись LevelConfig для текущего уровня или ближайшего ниже
+    const levelConfig = await this.prisma.levelConfig.findFirst({
+      where: {level: {lte: user.level}}, // lte - ищем уровень <= текущего
+      orderBy: {level: 'desc'}, // Берем максимальный из возможных
+    });
+
     return {
       level: user.level,
       xp: user.xp,
       xpToNextLevel: requiredXP,
       maxTaps: user.maxTaps,
+      tapCount: levelConfig ? levelConfig.tapCount : 1, // По умолчанию 1, если вообще записей нет
     };
   }
 }
