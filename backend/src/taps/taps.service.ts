@@ -21,14 +21,9 @@ export class TapsService {
     if (!user) throw new NotFoundException('User not found');
 
     const now = new Date();
-
-    // Получаем maxTaps через LevelsService
     const maxTaps = await this.levelsService.getMaxEnergy(user.level);
+    let regenInterval = BASE_REGEN_INTERVAL; // 1200 секунд (20 минут)
 
-    // Базовый интервал восстановления (например, 20 минут = 1200 сек)
-    let regenInterval = BASE_REGEN_INTERVAL;
-
-    // Проверяем активный буст increaseRegen (уменьшаем интервал в 2 раза)
     const activeBoost = await this.prismaService.activeBoost.findFirst({
       where: {
         userId,
@@ -37,33 +32,38 @@ export class TapsService {
       },
     });
 
-    if (activeBoost) {
-      regenInterval /= 2; // ускоряем восстановление в 2 раза
-    }
+    if (activeBoost) regenInterval /= 2; // Если есть буст, ускоряем в 2 раза
 
-    // Считаем время с последнего восстановления
     const elapsedTime = Math.floor(
       (now.getTime() - user.lastTapRegen.getTime()) / 1000
     );
 
-    // ЧАСТИЧНОЕ ВОССТАНОВЛЕНИЕ: восстанавливаем долю maxTaps
+    // Восстановленные тапы (с учетом равномерного распределения)
     const tapsToRegen = Math.floor((elapsedTime / regenInterval) * maxTaps);
 
-    // Обновляем количество тапов, но не превышаем maxTaps
-    const newTaps = Math.min(user.taps + tapsToRegen, maxTaps);
+    let newTaps = user.taps + tapsToRegen;
+    if (newTaps > maxTaps) newTaps = maxTaps;
 
-    // Если количество тапов изменилось, обновляем в БД
+    // Определяем оставшееся время до следующего восстановления
+    const nextRegen = Math.ceil(regenInterval - (elapsedTime % regenInterval));
+
+    // Обновляем lastTapRegen с учетом использованного времени
+    const regenTimeUsed = Math.floor((tapsToRegen / maxTaps) * regenInterval);
+    const newLastRegen = new Date(
+      user.lastTapRegen.getTime() + regenTimeUsed * 1000
+    );
+
     if (newTaps !== user.taps) {
       await this.prismaService.user.update({
         where: {id: userId},
-        data: {taps: newTaps, lastTapRegen: now},
+        data: {taps: newTaps, lastTapRegen: newLastRegen},
       });
     }
 
     return {
       taps: newTaps,
       maxTaps,
-      nextRegen: regenInterval - (elapsedTime % regenInterval), // сколько осталось до следующего прироста
+      nextRegen,
       regenSpeed: activeBoost ? 'FAST' : 'NORMAL',
     };
   }
@@ -71,50 +71,32 @@ export class TapsService {
   async useTaps(userId: number, amount: number = 1) {
     const user = await this.prismaService.user.findUnique({
       where: {id: userId},
-      include: {ActiveBoost: true}, // Загружаем активные бусты
+      include: {ActiveBoost: true},
     });
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (user.taps < amount) {
+    if (!user) throw new NotFoundException('User not found');
+    if (user.taps < amount)
       throw new BadRequestException('Not enough taps available');
-    }
 
-    // Получаем tapCount для текущего уровня
-    const levelConfig = await this.prismaService.levelConfig.findUnique({
-      where: {level: user.level},
+    const levelConfig = await this.prismaService.levelConfig.findFirst({
+      where: {level: {lte: user.level}},
+      orderBy: {level: 'desc'},
     });
 
-    // Если нет данных для текущего уровня, ищем ближайший предыдущий
-    const tapCount =
-      levelConfig?.tapCount ??
-      (
-        await this.prismaService.levelConfig.findFirst({
-          where: {level: {lte: user.level}},
-          orderBy: {level: 'desc'},
-        })
-      )?.tapCount ??
-      1; // Если вообще нет данных в LevelConfig, берём 1 по умолчанию
-
-    // Проверяем, есть ли активный буст на удвоение очков
+    const tapCount = levelConfig?.tapCount ?? 1;
     const hasDoublePointsBoost = user.ActiveBoost.some(
       boost =>
-        boost.effectType === 'doubleTapPoints' && boost.expiresAt > new Date()
+        boost.effectType === 'doubleTapPoints' &&
+        boost.expiresAt.getTime() > Date.now()
     );
 
-    // Вычисляем заработанные монеты
     let coinsEarned = amount * tapCount;
-    if (hasDoublePointsBoost) {
-      coinsEarned *= 2; // Удваиваем, если есть буст
-    }
+    if (hasDoublePointsBoost) coinsEarned *= 2;
 
-    // Обновляем пользователя: уменьшаем тапы, добавляем монеты
     const updatedUser = await this.prismaService.user.update({
       where: {id: userId},
       data: {
-        taps: {decrement: amount},
+        taps: Math.max(user.taps - amount, 0),
         balance: {increment: coinsEarned},
       },
       select: {taps: true, balance: true},
@@ -123,7 +105,7 @@ export class TapsService {
     return {
       taps: updatedUser.taps,
       balance: updatedUser.balance,
-      coinsEarned: coinsEarned,
+      coinsEarned,
       message: `${amount} tap(s) used`,
     };
   }
