@@ -25,10 +25,10 @@ export class TapsService {
     // Получаем maxTaps через LevelsService
     const maxTaps = await this.levelsService.getMaxEnergy(user.level);
 
-    // Определяем базовый интервал восстановления (например, 20 минут = 1200 сек)
+    // Базовый интервал восстановления (например, 20 минут = 1200 сек)
     let regenInterval = BASE_REGEN_INTERVAL;
 
-    // Проверяем активный буст increaseRegen (если есть, уменьшаем интервал)
+    // Проверяем активный буст increaseRegen (уменьшаем интервал в 2 раза)
     const activeBoost = await this.prismaService.activeBoost.findFirst({
       where: {
         userId,
@@ -38,7 +38,7 @@ export class TapsService {
     });
 
     if (activeBoost) {
-      regenInterval /= 2; // ускоряем в 2 раза
+      regenInterval /= 2; // ускоряем восстановление в 2 раза
     }
 
     // Считаем время с последнего восстановления
@@ -46,14 +46,13 @@ export class TapsService {
       (now.getTime() - user.lastTapRegen.getTime()) / 1000
     );
 
-    // Рассчитываем количество тапов, которые можно восстановить
-    const tapsToRegen = Math.floor(elapsedTime / regenInterval) * maxTaps;
+    // ЧАСТИЧНОЕ ВОССТАНОВЛЕНИЕ: восстанавливаем долю maxTaps
+    const tapsToRegen = Math.floor((elapsedTime / regenInterval) * maxTaps);
 
-    // Новое количество тапов
-    let newTaps = user.taps + tapsToRegen;
-    if (newTaps > maxTaps) newTaps = maxTaps;
+    // Обновляем количество тапов, но не превышаем maxTaps
+    const newTaps = Math.min(user.taps + tapsToRegen, maxTaps);
 
-    // Если количество тапов изменилось, обновляем БД
+    // Если количество тапов изменилось, обновляем в БД
     if (newTaps !== user.taps) {
       await this.prismaService.user.update({
         where: {id: userId},
@@ -64,7 +63,7 @@ export class TapsService {
     return {
       taps: newTaps,
       maxTaps,
-      nextRegen: regenInterval - (elapsedTime % regenInterval),
+      nextRegen: regenInterval - (elapsedTime % regenInterval), // сколько осталось до следующего прироста
       regenSpeed: activeBoost ? 'FAST' : 'NORMAL',
     };
   }
