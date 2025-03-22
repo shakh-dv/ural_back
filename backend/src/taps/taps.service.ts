@@ -83,12 +83,16 @@ export class TapsService {
       orderBy: {level: 'desc'},
     });
 
+    console.log(user);
+
     const tapCount = levelConfig?.tapCount ?? 1;
     const hasDoublePointsBoost = user.ActiveBoost.some(
       boost =>
         boost.effectType === 'doubleTapPoints' &&
         boost.expiresAt.getTime() > Date.now()
     );
+
+    console.log(hasDoublePointsBoost);
 
     let coinsEarned = amount * tapCount;
     if (hasDoublePointsBoost) coinsEarned *= 2;
