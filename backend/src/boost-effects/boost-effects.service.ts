@@ -2,12 +2,30 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import {PrismaService} from '../core/infra/prisma/prisma.service';
+import {Cron, CronExpression} from '@nestjs/schedule';
 
 @Injectable()
 export class BoostEffectsService {
+  private readonly logger = new Logger(BoostEffectsService.name);
   constructor(private readonly prismaService: PrismaService) {}
+
+  private async cleanupExpiredBoostsGlobally(): Promise<void> {
+    const {count} = await this.prismaService.activeBoost.deleteMany({
+      where: {expiresAt: {lt: new Date()}},
+    });
+    if (count > 0) {
+      this.logger.log(`Cleaned up ${count} expired boosts.`);
+    }
+  }
+
+  // Cron-job, который запускается каждые 5 минут
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  async handleCronCleanup() {
+    await this.cleanupExpiredBoostsGlobally();
+  }
 
   async applyBoostEffect(userId: number, boostItemId: number) {
     const boost = await this.prismaService.boostItem.findUnique({
