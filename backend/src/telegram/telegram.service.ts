@@ -12,12 +12,6 @@ export class TelegramService {
     this.channelUsername = this.configService.getOrThrow<string>(
       'TELEGRAM_CHANNEL_USERNAME'
     );
-
-    if (!this.botToken || !this.channelUsername) {
-      throw new Error(
-        'BOT_TOKEN или TELEGRAM_CHANNEL_USERNAME не заданы в .env'
-      );
-    }
   }
 
   async isUserSubscribed(userId: any): Promise<boolean> {
