@@ -19,6 +19,7 @@ import {BoostEffectsModule} from './boost-effects/boost-effects.module';
 import {UploadsModule} from './uploads/uploads.module';
 import {SERVER_STATIC} from './shared/constants/constants';
 import {ServeStaticModule} from '@nestjs/serve-static';
+import {TelegramModule} from "./telegram/telegram.module";
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import {ServeStaticModule} from '@nestjs/serve-static';
     BoostItemsModule,
     BoostEffectsModule,
     UploadsModule,
+    TelegramModule,
   ],
   controllers: [AppController],
   providers: [AppService],
