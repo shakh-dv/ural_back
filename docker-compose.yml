@@ -33,6 +33,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=30d
       - BOT_TOKEN=7668450099:AAEKau2UpSQbsD3n-tSBvI40b2_d7bfqa-Y
+      - TELEGRAM_CHANNEL_USERNAME=lqweqsdq
       - IMAGE_URL=https://api.uraltap.ru/uploads/dispatch/
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/ural?schema=public
       - CDN_EDGE_PREFIX=https://api.ural.ru/uploads/dispatch/

@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {Injectable} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
 import axios from 'axios';
 
 @Injectable()
@@ -8,12 +8,15 @@ export class TelegramService {
   private channelUsername: string;
 
   constructor(private configService: ConfigService) {
-    this.botToken = this.configService.get<string>('BOT_TOKEN') ?? '';
-    this.channelUsername =
-      this.configService.get<string>('TELEGRAM_CHANNEL_USERNAME') ?? '';
+    this.botToken = this.configService.getOrThrow<string>('BOT_TOKEN');
+    this.channelUsername = this.configService.getOrThrow<string>(
+      'TELEGRAM_CHANNEL_USERNAME'
+    );
 
     if (!this.botToken || !this.channelUsername) {
-      throw new Error('BOT_TOKEN или TELEGRAM_CHANNEL_USERNAME не заданы в .env');
+      throw new Error(
+        'BOT_TOKEN или TELEGRAM_CHANNEL_USERNAME не заданы в .env'
+      );
     }
   }
 
