@@ -83,16 +83,13 @@ export class TapsService {
       orderBy: {level: 'desc'},
     });
 
-    console.log(user);
-
     const tapCount = levelConfig?.tapCount ?? 1;
     const hasDoublePointsBoost = user.ActiveBoost.some(
       boost =>
         boost.effectType === 'doubleTapPoints' &&
+        boost.expiresAt !== null &&
         boost.expiresAt.getTime() > Date.now()
     );
-
-    console.log(hasDoublePointsBoost);
 
     let coinsEarned = amount * tapCount;
     if (hasDoublePointsBoost) coinsEarned *= 2;
@@ -113,63 +110,4 @@ export class TapsService {
       message: `${amount} tap(s) used`,
     };
   }
-
-  // async boostTaps(
-  //   userId: number,
-  //   boostData: {speedUp: number; duration: number}
-  // ) {
-  //   const user = await this.prismaService.user.findUnique({
-  //     where: {id: userId},
-  //   });
-  //   if (!user) throw new NotFoundException('User not found');
-  //
-  //   // Пример: уменьшаем lastTapRegen на boostData.speedUp минут
-  //   const boostedRegen = new Date(
-  //     user.lastTapRegen.getTime() - boostData.speedUp * 60 * 1000
-  //   );
-  //   await this.prismaService.user.update({
-  //     where: {id: userId},
-  //     data: {lastTapRegen: boostedRegen},
-  //   });
-  //
-  //   await this.prismaService.boost.create({
-  //     data: {
-  //       userId,
-  //       speedUp: boostData.speedUp,
-  //       duration: boostData.duration,
-  //     },
-  //   });
-  //
-  //   return {message: 'Boost applied'};
-  // }
-
-  // async claimTapBonus(userId: number) {
-  //   const user = await this.prismaService.user.findUnique({
-  //     where: {id: userId},
-  //   });
-  //   if (!user) throw new NotFoundException('User not found');
-  //
-  //   const today = new Date().toISOString().split('T')[0];
-  //   const usedBonuses = await this.prismaService.userBonus.count({
-  //     where: {userId, date: today},
-  //   });
-  //
-  //   if (usedBonuses >= 3) {
-  //     throw new BadRequestException('Daily bonus limit reached');
-  //   }
-  //
-  //   let newTaps = user.taps + 50;
-  //   if (newTaps > user.maxTaps) newTaps = user.maxTaps;
-  //
-  //   await this.prismaService.user.update({
-  //     where: {id: userId},
-  //     data: {taps: newTaps},
-  //   });
-  //
-  //   await this.prismaService.userBonus.create({
-  //     data: {userId, date: today},
-  //   });
-  //
-  //   return {taps: newTaps, message: 'Bonus applied'};
-  // }
 }

@@ -22,7 +22,7 @@ export class BoostEffectsService {
   }
 
   // Cron-job, который запускается каждые 5 минут
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleCronCleanup() {
     await this.cleanupExpiredBoostsGlobally();
   }
@@ -49,12 +49,37 @@ export class BoostEffectsService {
 
     switch (boost.effectType) {
       case 'resetTaps':
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const usageCount = await this.prismaService.activeBoost.count({
+          where: {
+            userId,
+            effectType: 'resetTaps',
+            createdAt: {gte: today},
+          },
+        });
+
+        if (usageCount >= 6) {
+          throw new BadRequestException(
+            'Daily limit for resetTaps reached (6 times)'
+          );
+        }
+
         // Мгновенно восстанавливаем энергию и сбрасываем таймер
         await this.prismaService.user.update({
           where: {id: userId},
           data: {
             taps: user.maxTaps,
             lastTapRegen: new Date(),
+          },
+        });
+
+        await this.prismaService.activeBoost.create({
+          data: {
+            userId,
+            effectType: 'resetTaps',
+            createdAt: new Date(),
           },
         });
         break;
