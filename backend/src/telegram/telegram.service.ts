@@ -20,7 +20,7 @@ export class TelegramService {
     }
   }
 
-  async isUserSubscribed(userId: number): Promise<boolean> {
+  async isUserSubscribed(userId: any): Promise<boolean> {
     const url = `https://api.telegram.org/bot${this.botToken}/getChatMember`;
 
     try {
