@@ -21,7 +21,6 @@ export class BoostEffectsService {
     }
   }
 
-  // Cron-job, который запускается каждые 5 минут
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleCronCleanup() {
     await this.cleanupExpiredBoostsGlobally();
@@ -90,15 +89,14 @@ export class BoostEffectsService {
           where: {
             userId,
             effectType: 'doubleTapPoints',
-            expiresAt: {gt: new Date()}, // Буст ещё не истёк
+            expiresAt: {gt: new Date()},
           },
         });
 
         if (existingBoost) {
-          throw new BadRequestException('Boost is already active'); // Ошибка для фронта
+          throw new BadRequestException('Boost is already active');
         }
 
-        // Если буста нет — создаем новый
         const durationMinutes = boost.effectValue ?? 4;
         await this.prismaService.activeBoost.create({
           data: {
@@ -110,7 +108,6 @@ export class BoostEffectsService {
         break;
 
       case 'increaseRegen':
-        // Ускоряем восстановление, если буст ещё не активен
         const activeRegenBoost = await this.prismaService.activeBoost.findFirst(
           {
             where: {

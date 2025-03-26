@@ -32,22 +32,21 @@ export class TapsService {
       },
     });
 
-    if (activeBoost) regenInterval /= 2; // Если есть буст, ускоряем в 2 раза
+    if (activeBoost) regenInterval /= 2;
 
     const elapsedTime = Math.floor(
       (now.getTime() - user.lastTapRegen.getTime()) / 1000
     );
 
-    // Восстановленные тапы (с учетом равномерного распределения)
+
     const tapsToRegen = Math.floor((elapsedTime / regenInterval) * maxTaps);
 
     let newTaps = user.taps + tapsToRegen;
     if (newTaps > maxTaps) newTaps = maxTaps;
 
-    // Определяем оставшееся время до следующего восстановления
     const nextRegen = Math.ceil(regenInterval - (elapsedTime % regenInterval));
 
-    // Обновляем lastTapRegen с учетом использованного времени
+
     const regenTimeUsed = Math.floor((tapsToRegen / maxTaps) * regenInterval);
     const newLastRegen = new Date(
       user.lastTapRegen.getTime() + regenTimeUsed * 1000
