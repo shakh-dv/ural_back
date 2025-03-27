@@ -31,25 +31,26 @@ enum TaskStatus {
 }
 
 model User {
-  id               Int           @id @default(autoincrement())
-  telegramId       BigInt        @unique @map("telegram_id")
-  firstName        String        @map("first_name")
-  avatar           String?
-  balance          Int           @default(0)
-  xp               Int           @default(0)
-  level            Int           @default(1)
-  maxTaps          Int           @default(500)
-  taps             Int           @default(500)
-  lastTapRegen     DateTime      @default(now())
-  referralCode     String        @unique @default(uuid())
-  referrals        Referral[]    @relation(name: "InviterRelation")
-  inviteeReferrals Referral[]    @relation(name: "InviteeRelation")
-  username         String?       @db.VarChar(255)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  UserTask         UserTask[]
-  UserBonus        UserBonus[]
-  ActiveBoost      ActiveBoost[]
+  id                Int                 @id @default(autoincrement())
+  telegramId        BigInt              @unique @map("telegram_id")
+  firstName         String              @map("first_name")
+  avatar            String?
+  balance           Int                 @default(0)
+  xp                Int                 @default(0)
+  level             Int                 @default(1)
+  maxTaps           Int                 @default(500)
+  taps              Int                 @default(500)
+  lastTapRegen      DateTime            @default(now())
+  referralCode      String              @unique @default(uuid())
+  referrals         Referral[]          @relation(name: "InviterRelation")
+  inviteeReferrals  Referral[]          @relation(name: "InviteeRelation")
+  username          String?             @db.VarChar(255)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  UserTask          UserTask[]
+  UserBonus         UserBonus[]
+  ActiveBoost       ActiveBoost[]
+  RaffleParticipant RaffleParticipant[]
 
   @@map("users")
 }
@@ -159,6 +160,43 @@ model Uploads {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
   Task       Task[]
+  Raffle     Raffle[]
 
   @@map("uploads")
+}
+
+model Raffle {
+  id                Int                 @id @default(autoincrement())
+  title             String
+  description       String?
+  price             Int
+  imageId           Int?
+  image             Uploads?            @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  endDate           DateTime
+  status            RaffleStatus        @default(ACTIVE)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  RaffleParticipant RaffleParticipant[]
+
+  @@map("raffles")
+}
+
+model RaffleParticipant {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  raffleId  Int
+  createdAt DateTime @default(now())
+
+  // Задаём имя отношения, чтобы внешние ключи получили уникальные имена
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  raffle Raffle @relation(fields: [raffleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, raffleId])
+  @@map("raffle_participants")
+}
+
+enum RaffleStatus {
+  ACTIVE
+  INACTIVE
+  COMPLETED
 }
