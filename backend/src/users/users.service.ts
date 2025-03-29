@@ -67,6 +67,17 @@ export class UsersService {
         balance: true,
         referralCode: true,
         ActiveBoost: true,
+        RaffleParticipant: {
+          select: {
+            raffle: {
+              select: {
+                id: true,
+                endDate: true,
+                status: true,
+              },
+            },
+          },
+        },
         createdAt: true,
         updatedAt: true,
       },
