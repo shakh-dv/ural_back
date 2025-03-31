@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import {PrismaService} from '../core/infra/prisma/prisma.service';
 import {TelegramService} from '../telegram/telegram.service';
+import * as console from "console";
 
 @Injectable()
 export class UserTasksService {
@@ -45,9 +46,11 @@ export class UserTasksService {
       throw new BadRequestException('Task already started or completed');
     }
 
-    if (task.taskType === 'subscribe') {
+    if (task.taskType === 'subscribe' && task.link) {
+      const chatId = this.telegramService.extractChatId(task.link);
       const isSubscribed = await this.telegramService.isUserSubscribed(
-        user.telegramId
+        user.telegramId,
+        chatId
       );
       if (!isSubscribed) {
         throw new BadRequestException('User has not subscribed yet');

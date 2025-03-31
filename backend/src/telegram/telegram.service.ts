@@ -1,26 +1,22 @@
-import {Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import axios from 'axios';
 
 @Injectable()
 export class TelegramService {
   private botToken: string;
-  private channelUsername: string;
 
   constructor(private configService: ConfigService) {
     this.botToken = this.configService.getOrThrow<string>('BOT_TOKEN');
-    this.channelUsername = this.configService.getOrThrow<string>(
-      'TELEGRAM_CHANNEL_USERNAME'
-    );
   }
 
-  async isUserSubscribed(userId: any): Promise<boolean> {
+  async isUserSubscribed(userId: any, chatId: any): Promise<boolean> {
     const url = `https://api.telegram.org/bot${this.botToken}/getChatMember`;
 
     try {
       const response = await axios.get(url, {
         params: {
-          chat_id: `@${this.channelUsername}`,
+          chat_id: `@${chatId}`,
           user_id: userId,
         },
       });
@@ -34,5 +30,11 @@ export class TelegramService {
       );
       return false;
     }
+  }
+
+  extractChatId(link: string): string {
+    const match = link.match(/t\.me\/([^/]+)/);
+    if (!match) throw new BadRequestException('Invalid Telegram link');
+    return match[1];
   }
 }
