@@ -24,12 +24,11 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({extended: true}));
   app.useLogger(systemLogger);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter, cls, systemLogger));
-  app.enableCors();
-  // {
-  //   origin: configService.getOrThrow<string>('REACT_APP_URL'),
-  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  //   credentials: true,
-  // }
+  app.enableCors({
+    origin: configService.getOrThrow<string>('REACT_APP_URL'),
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   if (
     ['development', 'staging'].includes(
