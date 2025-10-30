@@ -21,7 +21,7 @@ services:
   back:
     restart: always
     environment:
-      - BASE_URL=https://api.ural.ru
+      - BASE_URL=https://api-duckgank.ru
       - NODE_ENV=production
       - APP_NAME=ural
       - SERVER_PORT=4000
@@ -33,16 +33,16 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=30d
       - BOT_TOKEN=7668450099:AAEKau2UpSQbsD3n-tSBvI40b2_d7bfqa-Y
-      - IMAGE_URL=https://api-uraltap.com/uploads/dispatch/
+      - IMAGE_URL=https://api-duckgank.ru/uploads/dispatch/
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/ural?schema=public
-      - CDN_EDGE_PREFIX=https://api.ural.ru/uploads/dispatch/
+      - CDN_EDGE_PREFIX=https://api-duckgank.ru/uploads/dispatch/
       - REACT_APP_URL=https://ural-tap.vercel.app/
     build:
       context: ./backend
       target: prod
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ural-backend.rule=Host(`api-uraltap.com`)"
+      - "traefik.http.routers.ural-backend.rule=Host(`api-duckgank.ru`)"
       - "traefik.http.routers.ural-backend.tls=true"
       - "traefik.http.routers.ural-backend.tls.certresolver=letsencrypt"
       - "traefik.http.services.ural-backend.loadbalancer.server.port=4000"
